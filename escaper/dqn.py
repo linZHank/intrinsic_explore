@@ -1,15 +1,19 @@
+import jax.numpy as jnp
 import gymnasium as gym
+import gym_explore
 from lite_agents.dqn import DQNAgent, ReplayBuffer
+import matplotlib.pyplot as plt
 
 
 # SETUP
-env = gym.make("escaper-v0")
+env = gym.make("Escaper-v0")
 buffer = ReplayBuffer(10000, env.observation_space.shape)
 agent = DQNAgent(
     seed=19,
     obs_shape=env.observation_space.shape,
     num_actions=env.action_space.n,
     hidden_sizes=(64, 64),
+    warmup_episodes=1,
 )
 print(
     agent.qnet.tabulate(
@@ -27,7 +31,7 @@ pobs, _ = env.reset()
 
 
 # LEARN
-for st in range(20000):
+for st in range(50000):
     act, qvals = agent.make_decision(
         jnp.expand_dims(pobs, axis=0),
         params,
@@ -52,7 +56,7 @@ plt.plot(average_return)
 plt.show()
 
 # VALIDATE
-env = gym.make('escaper-v0', render_mode='human')
+env = gym.make('Escaper-v0', render_mode='human')
 pobs, _ = env.reset()
 term, trunc = False, False
 for _ in range(1000):
